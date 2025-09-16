@@ -1,0 +1,50 @@
+Action Plan for Completing AutomatedAIpowered Project (1 Week)
+
+Day 1: Project Setup & Azure Bot Registration
+- Review instructions.txt and existing folder structure.
+- Register Azure Bot resource in Azure Portal to get Microsoft App ID and secret.
+- Enable Teams channel for the bot.
+- Set a placeholder messaging endpoint.
+- Update appPackage/manifest.json with the new App ID and bot details.
+- Store credentials securely in env/.env.* files.
+
+Day 2: Infrastructure & Environment Configuration
+- Review and update infra/azure.bicep for required Azure resources (Bot, Storage, AI services if needed).
+- Deploy infrastructure using Azure CLI or Bicep.
+- Ensure all environment variables are set in env/ files.
+- Test Azure resource deployment and connectivity.
+
+Day 3: Bot Backend & Enrollment Logic
+- Review and update src/bot.py for Teams message handling.
+- Implement user enrollment logic (start 30-day journey, store user info).
+- Set up storage for user progress (can use Azure Table Storage or Cosmos DB).
+- Test enrollment flow in Teams using devTools/teamsapptester.
+
+Day 4: AI Question Generation & Daily Quiz Logic
+- Integrate AI question generation using prompts/chat/skprompt.txt and config.json.
+- Implement daily quiz logic: generate 10 questions, mix in previous wrong answers.
+- Store and retrieve user progress and question history.
+- Test question generation and delivery in Teams.
+
+Day 5: Answer Evaluation & Progress Tracking
+- Implement answer evaluation logic in bot.py.
+- Update user progress and wrongQueue based on answers.
+- Ensure correct/incorrect answers are tracked for next day’s quiz.
+- Test answer handling and progress updates.
+
+Day 6: Scheduling & Proactive Messaging
+- Set up daily scheduler (Azure Function or Logic App) to trigger daily quiz delivery.
+- Implement proactive messaging to remind users each day.
+- Test daily reminders and quiz delivery automation.
+
+Day 7: Final Testing, Packaging & Documentation
+- Test the full 30-day flow (simulate days if needed).
+- Update README.md with setup and usage instructions.
+- Package the Teams app (manifest + icons) and upload to Teams for testing.
+- Review and finalize all code, configs, and documentation.
+
+Optional: Add dashboard/tab, certificates, or admin panel if time permits.
+
+---
+
+This plan assumes you are using Azure for hosting and storage, as per your current folder structure. Adjust as needed if you want to use AWS as in instructions.txt.

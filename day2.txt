@@ -1,0 +1,138 @@
+Day 2: Environment Strategy & Infrastructure Options (Detailed Plan)
+
+## Choose Your Development Path
+
+### Option A: Continue with Sandbox Development (Recommended for MVP)
+
+1. Set Up Sandbox Environment
+- Create playground/ directory structure for file-based storage
+- Configure .env.playground with sandbox-specific settings
+- No Azure infrastructure deployment needed - work entirely locally
+
+2. Configure Sandbox Storage
+- Create playground/data/ directory for user data and quiz storage
+- Set up playground/logs/ for application logging
+- Implement file-based persistence for rapid development
+
+3. Test Sandbox Environment
+- Install ngrok for local tunnel: `ngrok http 3978`
+- Update Teams Developer Portal with ngrok URL
+- Test basic bot connectivity in your sandbox Teams
+
+4. Benefits of Sandbox Path:
+- ✅ Zero infrastructure costs
+- ✅ Rapid development and testing
+- ✅ Perfect for proof of concept
+- ✅ Easy debugging and iteration
+
+### Option B: Deploy Azure Infrastructure (For Production Scale)
+
+1. Review Infrastructure as Code Files
+- Open infra/azure.bicep and infra/azure.parameters.json to understand Azure resources (Bot Service, Storage, AI services)
+- Check infra/botRegistration/azurebot.bicep for bot-specific deployment
+
+2. Update Infrastructure Definitions
+- Modify Bicep files to match your requirements (storage accounts, resource names, AI services)
+- Ensure all required resources for production bot are included
+
+3. Deploy Azure Infrastructure
+- Use Azure CLI to deploy Bicep templates:
+  ```bash
+  az deployment group create --resource-group <your-resource-group> --template-file infra/azure.bicep --parameters @infra/azure.parameters.json
+  ```
+- Monitor deployment and verify all resources in Azure Portal
+
+4. Configure Production Environment Variables
+- Update .env.production with Azure resource connection strings
+- Add Azure Storage connection strings, AI service keys
+- Ensure secrets are properly secured
+
+5. Test Azure Resource Connectivity
+- Verify all Azure resources are accessible
+- Test connections from development environment
+- Configure Azure Bot Service endpoint
+
+### Option C: Hybrid Approach
+
+1. Start with Sandbox Development
+- Follow Option A for initial development and testing
+- Use sandbox for rapid iteration and feature development
+
+2. Prepare Azure Infrastructure
+- Deploy Azure resources following Option B
+- Keep Azure environment ready for specific deployments
+
+3. Strategic Deployment
+- Use sandbox for ongoing development
+- Deploy to Azure for customer demos or production instances
+- Maintain both environments simultaneously
+
+## Environment Configuration
+
+### Sandbox Configuration (.env.playground)
+```
+# Bot Configuration (from Teams Developer Portal)
+BOT_ID=your-sandbox-bot-id
+BOT_PASSWORD=your-sandbox-bot-password
+
+# OpenAI Configuration
+OPENAI_API_KEY=your-openai-api-key
+OPENAI_MODEL=gpt-3.5-turbo
+
+# Sandbox Settings
+ENVIRONMENT=sandbox
+STORAGE_TYPE=file
+DATA_DIRECTORY=playground/data
+LOG_DIRECTORY=playground/logs
+```
+
+### Production Configuration (.env.production)
+```
+# Azure Bot Service
+BOT_ID=your-azure-bot-id
+BOT_PASSWORD=your-azure-bot-password
+
+# OpenAI Configuration
+OPENAI_API_KEY=your-openai-api-key
+
+# Azure Storage
+AZURE_STORAGE_CONNECTION_STRING=your-azure-storage-connection
+STORAGE_TYPE=azure_table
+ENVIRONMENT=production
+```
+
+## Decision Framework
+
+**Choose Sandbox if:**
+- Building proof of concept or MVP
+- User base < 50 people
+- Budget-conscious development
+- Need rapid iteration and testing
+- Internal team training/education
+
+**Choose Azure if:**
+- Need to support >100 users
+- Require enterprise compliance
+- Want production-grade monitoring
+- Need automatic daily scheduling
+- External customer deployment
+
+**Choose Hybrid if:**
+- Want best of both worlds
+- Need development flexibility
+- Plan gradual production rollout
+- Have mixed use cases
+
+## Prepare for Day 3
+- Record your chosen approach in project documentation
+- Ensure environment variables are configured for your chosen path
+- Verify connectivity (ngrok for sandbox, Azure resources for production)
+- Review backend code requirements for your chosen environment
+
+---
+
+**Recommendation:** Start with sandbox development for rapid feature development, then migrate to Azure when you need production scale or enterprise features.
+
+---
+
+This plan ensures your Azure infrastructure is ready and all environment variables are set for backend development.

@@ -1,0 +1,83 @@
+Step-by-step (AWS + Microsoft Teams)
+0) Prereqs
+* A Microsoft 365 tenant with permission to upload custom apps to Teams.
+* AWS account with access to Lambda, API Gateway, DynamoDB, EventBridge, Secrets Manager, and (optionally) Bedrock.
+
+1) Register the bot with Microsoft (so Teams can reach your AWS endpoint)
+1. Create an Azure Bot resource (channel registration) to obtain a Microsoft App ID and set a password (client secret).
+2. Enable the Microsoft Teams channel for the bot.
+3. Temporarily set the messaging endpoint to a placeholder; you’ll replace it with your API Gateway URL after deployment. Microsoft Learn+1
+Why this matters: Teams only delivers messages to endpoints associated with a registered bot. Registration doesn’t force you to host on Azure—you can host your bot anywhere (AWS) as long as the public HTTPS endpoint is reachable.
+
+2) Provision AWS foundation
+* Secrets Manager: store MICROSOFT_APP_ID, MICROSOFT_APP_PASSWORD, and (if used) external LLM keys.
+* DynamoDB (e.g., table LearningApp):
+    * PK: userId
+    * SK: courseId#day
+    * Attributes: score, answers, wrongQueue[], status (e.g., in_progress/completed), lastActivityAt.
+* CloudWatch Logs: enabled by default with Lambda for observability.
+
+3) Choose AI generation
+* If you want fully on-AWS AI, enable Amazon Bedrock access to your preferred model(s) and call the Bedrock Runtime from Lambda to generate daily MCQs. See JS SDK examples and InvokeModel. AWS Documentation+1
+
+4) Implement the bot (Node.js recommended)
+* Use Bot Framework SDK v4 in a Lambda function. Create an adapter (BotFrameworkHttpAdapter) using your Microsoft App ID/Password (pulled from Secrets Manager), and handle POST /api/messages to call adapter.processActivity(...). Microsoft Learn
+Core handlers you’ll write:
+* enrollUser(courseId) – initialize Day 1 record in DynamoDB.
+* generateDailyQuiz(user, day) – call Bedrock/OpenAI to produce 10 MCQs; mix in previously wrong questions.
+* renderQuizAsAdaptiveCards(questions) – send MCQs as Adaptive Cards with radio choices and Action.Submit. Microsoft Learn+1
+* evaluateAnswer(payload) – check choice, update DynamoDB (wrongQueue if incorrect).
+* completeDay(user, day) – persist score; schedule tomorrow’s reminder (see Step 7).
+Tip: Keep a lightweight “question schema” (stem, options A–D, correctIndex, explanation, source/topic tags) so regeneration and re-asking are deterministic.
+
+5) Put the bot behind a public AWS URL
+Option A (most common): API Gateway (HTTP API) → Lambda (proxy integration).
+* Create an HTTP API with a POST /api/messages route → integrate with your Lambda.
+* Enable a custom domain if wanted, HTTPS is required. AWS Documentation+2AWS Documentation+2
+Alternative: ALB → Lambda is also viable if you prefer ALB features for webhooks.
+
+6) Wire Teams → AWS
+* Take the API Gateway invoke URL (e.g., https://xyz.execute-api.../api/messages) and update the Azure Bot resource’s Messaging endpoint with it; keep Teams channel enabled.
+* Install your app in Teams and start chatting with the bot. Microsoft Learn
+
+7) Daily reminders & progress nudges (proactive messages)
+* Save the conversation reference for each user on first contact.
+* Create a daily EventBridge Scheduler (cron) that invokes a Lambda which:
+    1. Looks up users who haven’t completed today,
+    2. Uses the conversation reference to send a proactive message (“Day 7 is ready!”). AWS Documentation+1Microsoft Learn+1
+
+8) Re-asking wrong answers (adaptive learning loop)
+* Keep a wrongQueue per course. When generating the next day’s 10 questions, sample 2–4 from wrongQueue and the rest new questions from the same topic area.
+* On correct resolution, evict from wrongQueue. (Logic is app-level; no special service needed.)
+
+9) Optional: Add a Teams Tab for dashboards
+* Host a small React/Next.js progress dashboard on S3 + CloudFront.
+* Add it as a static tab in your Teams app manifest (contentUrl → CloudFront URL).
+* Use Adaptive Cards in chat for daily quizzes; use the Tab for richer analytics, streaks, and certificates. Microsoft Learn+2Microsoft Learn+2
+
+10) Package & upload the Teams app
+* Build a Teams manifest referencing your bot’s Microsoft App ID (from the Azure Bot resource).
+* Include (optionally) your Tab definition.
+* Zip the manifest with icons; upload it to Teams (tenant app catalog) and test. Microsoft Learn
+
+11) Production hardening
+* Secrets: keep creds in Secrets Manager; rotate regularly.
+* Retry & idempotency: Bot messages can be retried; ensure your handlers are idempotent.
+* Observability: Use CloudWatch Logs & metrics; consider DLQs for failed reminder events.
+* Concurrency: Set Lambda memory/concurrency to handle quiz spikes.
+* Security headers: If you add a Tab, make sure CSP/X-Frame-Options allow rendering inside Teams. Microsoft Learn
+
+12) Nice extras
+* Certificates: Generate a completion certificate PDF on Day 30 (Lambda + S3).
+* Admin panel: simple CRUD to define/curate course taxonomies and seed topics.
+* Content mixing: interleave mini-explanations after each question to reinforce.
+
+Minimal build order (checklist)
+1. Register Azure Bot + enable Teams channel (get App ID/secret). Microsoft Learn+1
+2. Secrets Manager, DynamoDB table, Bedrock access. AWS Documentation
+3. Lambda bot with Bot Framework SDK; handlers for enroll/quiz/evaluate. Microsoft Learn
+4. API Gateway HTTP API → Lambda (proxy). AWS Documentation
+5. Update Messaging endpoint to API Gateway URL; test in Teams. Microsoft Learn
+6. Adaptive Cards for MCQs; persist results. Microsoft Learn
+7. EventBridge Scheduler + proactive messages for daily nudges. AWS DocumentationMicrosoft Learn
+8. (Optional) S3/CloudFront tab + manifest update. Microsoft Learn+1

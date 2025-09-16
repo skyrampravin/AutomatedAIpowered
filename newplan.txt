@@ -1,0 +1,47 @@
+7-Day Action Plan for AI-Powered 30-Day Course Challenge Teams App
+
+Day 1: Requirements & Project Setup
+- Review the project goal: An app for employees to enroll in a 30-day AI-driven MCQ course, integrated with Microsoft Teams.
+- List all features: enrollment, daily AI-generated MCQs, wrong answer tracking, repeat questions, Teams integration.
+- Set up the project folder and ensure all dependencies (Python, Teams SDK, Azure/AWS SDKs) are installed.
+- Create or review a README.md with project overview and requirements.
+
+Day 2: Teams App Registration & Manifest
+- Register the app in Microsoft Teams Developer Portal.
+- Create or update appPackage/manifest.json with app details, bot endpoint, and permissions.
+- Add app icons (color.png, outline.png).
+- Prepare the app for sideloading in Teams for testing.
+
+Day 3: User Enrollment & Data Storage
+- Design the data model for user enrollment, progress, and wrong answer tracking (e.g., userId, courseId, day, wrongQueue).
+- Implement backend logic (in src/bot.py or app.py) for user enrollment and storing user data.
+- Set up a database or storage solution (Azure Table Storage, Cosmos DB, or similar).
+- Test enrollment flow and data persistence.
+
+Day 4: AI Question Generation
+- Integrate with an AI service (Azure OpenAI, Cognitive Services, or similar) to generate 10 daily MCQs for each user.
+- Design a question schema (question, options, correct answer, explanation, tags).
+- Implement logic to mix in previously incorrect questions (wrongQueue) with new ones.
+- Test question generation and storage.
+
+Day 5: Daily Quiz Delivery & Answer Handling
+- Implement logic to send daily quizzes to enrolled users in Teams (using Adaptive Cards for MCQs).
+- Handle user responses, evaluate answers, and update progress and wrongQueue.
+- Provide feedback to users on correct/incorrect answers.
+- Test the full daily quiz and answer flow in Teams.
+
+Day 6: Scheduling & Reminders
+- Set up a scheduler (Azure Function, Logic App, or background task) to trigger daily quiz delivery and reminders.
+- Implement proactive messaging to remind users to complete their daily quiz.
+- Test scheduling and reminder functionality.
+
+Day 7: Final Testing, Packaging & Documentation
+- Simulate the 30-day flow for a test user to ensure all features work as intended.
+- Fix any bugs or issues found during testing.
+- Update README.md with setup, usage, and troubleshooting instructions.
+- Package the Teams app (manifest + icons) and upload for final testing.
+- Review all code, configs, and documentation for completeness and security.
+
+---
+
+This plan is tailored to your project’s goal of a 30-day AI-powered MCQ challenge app for Teams, with clear daily steps for rapid development and deployment.

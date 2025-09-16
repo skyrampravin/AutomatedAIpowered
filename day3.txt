@@ -1,0 +1,84 @@
+Day 3: Sandbox Bot Development & Enrollment Logic (Detailed Plan)
+
+## Sandbox-First Bot Development
+
+1. Review Existing Bot Code Structure
+- Open src/bot.py and src/app.py to understand current bot logic and app structure
+- Identify Teams message handling and user interaction processing
+- Note: We'll implement sandbox-specific storage for rapid development
+
+2. Implement SandboxStorage Class
+- Create src/sandbox_storage.py for file-based data persistence
+- Use playground/data/ directory for user profiles and quiz data
+- Implement JSON-based storage for user enrollment and progress
+- Benefits: No database setup, instant development, easy debugging
+
+3. Build User Enrollment Logic for Sandbox
+- Add enrollment commands that work with local file storage
+- Store user data in playground/data/{user_id}_profile.json format
+- Track: enrollment date, course selection, progress metrics
+- Implement course catalog with predefined learning paths
+
+4. Set Up Sandbox Progress Tracking
+- Design simple JSON schema for user progress and quiz history
+- Create playground/data/{user_id}_quizzes.json for quiz results
+- Track daily questions, answers, streaks, and wrong question queue
+- Easy to inspect and debug via file system & Enrollment Logic (Detailed Plan)
+
+1. Review Existing Bot Code
+- Open src/bot.py and src/app.py to understand the current bot logic and app structure.
+- Identify where Teams messages are handled and how user interactions are processed.
+
+2. Implement User Enrollment Logic
+- Add or update code to allow users to enroll in a course (start their 30-day journey).
+- Store user enrollment data in your chosen storage (e.g., Azure Table Storage, Cosmos DB).
+- Ensure each user’s start date, course ID, and initial progress are recorded.
+
+3. Set Up Progress Tracking
+- Design a schema for tracking user progress, daily questions, and wrong answers (wrongQueue).
+- Implement functions to read/write user progress and question history to storage.
+
+4. Test Enrollment Flow
+- Use devTools/teamsapptester or Teams Developer Portal to simulate user enrollment and verify data is stored correctly.
+- Check that the bot responds appropriately to enrollment commands/messages.
+
+5. Test Enrollment with ngrok and Sandbox Teams
+- Use ngrok to expose local bot for Teams testing
+- Test enrollment flow in your sandbox Teams environment
+- Verify data is correctly stored in playground/data/ files
+- Debug easily by examining JSON files directly
+
+6. Implement Sandbox-Specific Features
+- Add /admin command for viewing playground data statistics
+- Implement file-based backup and restore functionality
+- Create simple monitoring for sandbox environment health
+- Enable easy data reset for testing purposes
+
+7. Alternative: Azure Storage Integration
+- If using Azure path, implement Azure Table Storage for user data
+- Use Azure Storage SDK for data persistence
+- Configure connection strings and authentication
+- Note: This requires Azure infrastructure from Day 2
+
+## Sandbox Development Benefits
+- ✅ Immediate development without database setup
+- ✅ Easy data inspection and debugging
+- ✅ Fast iteration and testing cycles
+- ✅ Zero infrastructure dependencies
+- ✅ Perfect for MVP and proof of concept
+
+## Testing Strategy
+1. **Local Testing**: Use ngrok + sandbox Teams for immediate feedback
+2. **Data Inspection**: Examine JSON files directly for debugging
+3. **Easy Reset**: Clear playground/data/ to reset all user data
+4. **Multiple Users**: Test with different sandbox users simultaneously
+
+8. Prepare for Day 4 (AI Integration)
+- Review prompts/chat/ directory for question generation templates
+- Plan OpenAI integration with sandbox storage
+- Prepare for local question generation and evaluation testing
+- Ensure sandbox environment can handle AI API calls efficiently
+
+---
+
+**Sandbox Development Advantage:** You can have a fully functional learning bot running in minutes with zero infrastructure costs, perfect for rapid prototyping and feature development before scaling to production.

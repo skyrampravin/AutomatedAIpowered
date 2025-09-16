@@ -1,0 +1,74 @@
+Day 1 Execution Steps for AutomatedAIpowered Project (Sandbox-First Approach)
+
+## Recommended: Start with Microsoft 365 Developer Sandbox
+
+1. Review Project Materials
+- Open instructions.txt and read the project requirements and workflow
+- Explore the AutomatedAIpowered folder structure and note key files:
+  - appPackage/manifest.json (Teams app manifest)
+  - src/bot.py, src/app.py (bot and app logic)
+  - infra/azure.bicep (infrastructure as code - for later if needed)
+  - env/.env.* (environment variables)
+
+2. Set Up Microsoft 365 Developer Sandbox (FREE)
+- Go to https://developer.microsoft.com/microsoft-365/dev-program
+- Join the Microsoft 365 Developer Program (no cost)
+- Set up instant sandbox with pre-configured users and sample data
+- Note your sandbox tenant domain (e.g., yourname.onmicrosoft.com)
+
+3. Register Bot in Teams Developer Portal (Sandbox Method)
+- Go to https://dev.teams.microsoft.com/ and sign in with sandbox account
+- Create new app → Bot → Create new bot
+- Note the Bot ID (App ID) and generate Client Secret
+- This creates a bot in your sandbox tenant without Azure subscription
+
+4. Update Teams App Manifest for Sandbox
+- Open appPackage/manifest.json in your editor
+- Replace the botId with your new Bot ID from Teams Developer Portal
+- Update developer information to match your sandbox tenant
+- Update app name and description for sandbox development
+
+5. Create Sandbox Environment Configuration
+- Create .env.playground file with sandbox-specific settings:
+  ```
+  # Sandbox Bot Configuration (from Teams Developer Portal)
+  BOT_ID=your-sandbox-bot-id
+  BOT_PASSWORD=your-sandbox-client-secret
+  
+  # OpenAI Configuration
+  OPENAI_API_KEY=your-openai-api-key
+  OPENAI_MODEL=gpt-3.5-turbo
+  
+  # Sandbox Settings
+  ENVIRONMENT=sandbox
+  STORAGE_TYPE=file
+  DATA_DIRECTORY=playground/data
+  ```
+
+## Alternative: Azure Bot Registration (For Production Later)
+
+6. Azure Bot Resource (Optional - If Going Straight to Azure)
+- Go to https://portal.azure.com/ and create "Azure Bot" resource
+- Note Microsoft App ID and generate Client Secret
+- Enable Microsoft Teams channel
+- Use .env.production for Azure-specific configuration
+
+7. Verify Sandbox Setup
+- Confirm Teams Developer Portal bot is created and configured
+- Check that manifest.json references correct sandbox Bot ID
+- Verify .env.playground has correct sandbox credentials
+- Ensure environment is ready for local development with ngrok
+
+8. Install Required Tools for Sandbox Development
+- Install ngrok for local tunneling: https://ngrok.com/download
+- Ensure Python 3.11+ is installed for bot development
+- Install Teams app in your sandbox tenant for testing
+
+9. Prepare for Day 2 (Environment Strategy)
+- Record your chosen approach (sandbox vs Azure vs hybrid)
+- Note Bot ID and credentials for next steps
+- Review Day 2 options for infrastructure vs continued sandbox development
+
+---
+
+**Sandbox Benefits:** Zero infrastructure costs, immediate development capability, perfect for MVP and proof-of-concept development before scaling to Azure.

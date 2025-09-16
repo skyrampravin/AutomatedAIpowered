@@ -1,0 +1,88 @@
+Day 4: Sandbox AI Integration & Question Generation (Detailed Plan)
+
+## Sandbox AI Question Generation
+
+1. Review AI Prompt Templates
+- Open src/prompts/chat/skprompt.txt and config.json to understand question generation requirements
+- Adapt prompts for sandbox development with OpenAI API integration
+- Design prompts that work well with file-based storage system
+
+2. Implement SandboxQuestionGenerator Class
+- Create src/sandbox_question_generator.py for OpenAI integration
+- Use direct OpenAI API calls (no Azure AI services needed)
+- Generate questions and store immediately in playground/data/ files
+- Benefits: Simple setup, immediate testing, cost-effective development
+
+3. Build Sandbox Daily Quiz Logic
+- Implement question generation that works with local file storage
+- Mix new AI-generated questions with previously wrong answers from playground files
+- Store generated questions in playground/data/{user_id}_daily_questions.json
+- Enable immediate testing and iteration without database complexity
+
+4. Create Sandbox Question Delivery System
+- Format questions as Teams Adaptive Cards for interactive quiz experience
+- Implement local question serving from playground/data/ files
+- Track quiz sessions in sandbox storage format
+- Enable rapid testing with ngrok tunnel to sandbox Teams
+
+5. Test AI Integration in Sandbox Environment
+- Generate sample questions using OpenAI API
+- Test question delivery through ngrok tunnel
+- Verify questions are stored correctly in playground/data/ files
+- Debug AI responses by examining generated JSON files directly
+
+6. Implement Sandbox Question Management
+- Add /generate-quiz command for manual question generation testing
+- Create question preview functionality for development
+- Implement question quality validation and filtering
+- Enable easy question regeneration for testing purposes
+
+7. Optimize for Sandbox Development
+- Cache frequently used question templates in playground/templates/
+- Implement offline mode with pre-generated questions for development
+- Add question statistics and generation monitoring
+- Create sandbox-specific question categories and difficulty levels
+
+8. Alternative: Azure AI Services Integration
+- If using Azure path, integrate with Azure OpenAI or Cognitive Services
+- Configure Azure AI service endpoints and authentication
+- Use Azure-specific SDKs and connection patterns
+- Note: Requires Azure infrastructure and additional costs
+
+## Sandbox AI Benefits
+- ✅ Direct OpenAI API integration (no Azure complexity)
+- ✅ Immediate question generation and testing
+- ✅ File-based question storage for easy inspection
+- ✅ Rapid iteration and prompt optimization
+- ✅ Cost-effective development (pay only for OpenAI usage)
+
+## Question Storage Structure
+```
+playground/
+├── data/
+│   ├── user123_daily_questions.json    # Generated questions
+│   ├── user123_question_history.json   # Question history
+│   └── user123_wrong_answers.json      # Wrong answer queue
+├── templates/
+│   ├── python_questions.json           # Question templates
+│   └── general_questions.json          # Fallback questions
+└── logs/
+    └── ai_generation.log               # AI API call logs
+```
+
+## Testing Strategy
+1. **Local Generation**: Test OpenAI integration with simple prompts
+2. **Question Quality**: Validate generated questions manually
+3. **Storage Testing**: Verify questions save correctly to files
+4. **Teams Integration**: Test question delivery via ngrok tunnel
+5. **Performance**: Monitor AI generation speed and costs
+
+9. Prepare for Day 5 (Answer Evaluation)
+- Plan answer evaluation logic that works with sandbox storage
+- Design progress tracking that integrates with file-based storage
+- Prepare for implementing SandboxAnswerEvaluator class
+- Ensure question-answer linking works seamlessly in sandbox
+
+---
+
+**Sandbox AI Advantage:** Direct OpenAI integration allows immediate AI-powered question generation without Azure infrastructure complexity, perfect for rapid prototyping and feature validation.

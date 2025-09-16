@@ -1,0 +1,44 @@
+# ngrok Configuration for Corporate Networks
+version: "2"
+
+# Your ngrok authtoken (get from https://dashboard.ngrok.com/get-started/your-authtoken)
+authtoken: YOUR_NGROK_AUTHTOKEN_HERE
+
+# Tunnel configurations
+tunnels:
+  teams-bot:
+    proto: http
+    addr: 3978
+    # Use specific region (us, eu, ap, au, sa, jp, in)
+    region: us
+    # Bind to both HTTP and HTTPS
+    bind_tls: true
+    # Custom headers for corporate proxies
+    request_headers:
+      add:
+        - "X-Forwarded-Proto: https"
+    # Inspect tunnel traffic (helpful for debugging)
+    inspect: true
+    
+  # Alternative configuration for different port
+  teams-bot-alt:
+    proto: http
+    addr: 8000
+    region: eu
+    bind_tls: true
+
+# Corporate proxy settings (uncomment and configure if needed)
+# proxy_url: http://proxy.company.com:8080
+
+# Logging for troubleshooting
+log_level: info
+log_format: json
+log: ./ngrok.log
+
+# Web interface configuration
+web_addr: localhost:4040
+console_ui: true
+
+# Update checking
+update_channel: stable
+update_check: true
