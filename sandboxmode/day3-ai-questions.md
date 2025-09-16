@@ -1,17 +1,17 @@
-# Day 3: AI-Powered Question Generation (Codespaces)
+# Day 3: AI-Powered Question Generation with Bot Framework Emulator
 
-## 🎯 **Goal**: Implement OpenAI-powered personalized question generation in cloud
+## 🎯 **Goal**: Implement OpenAI-powered personalized question generation and test with Bot Framework Emulator
 
 **Time Required**: 60-75 minutes  
-**Prerequisites**: Day 1 & 2 completed (Codespace running)  
-**Outcome**: Bot generates and asks personalized learning questions in cloud environment
+**Prerequisites**: Day 1 & 2 completed (Codespace running, Bot Framework Emulator connected)  
+**Outcome**: Bot generates and asks personalized learning questions testable in Bot Framework Emulator
 
 ---
 
-## **Step 1: Create Question Generator (20 minutes)**
+## **Step 1: Create AI Question Generator (20 minutes)**
 
 ### 1.1 OpenAI Question Generator Class
-1. **Create**: `src/sandbox_question_generator.py`
+1. **Create**: `src/ai_question_generator.py`
 
 ```python
 import os
@@ -26,7 +26,7 @@ import openai
 from openai import OpenAI
 
 from config import Config
-from sandbox_storage import SandboxStorage, UserProfile
+from local_storage import LocalStorage, UserProfile
 
 @dataclass
 class QuizQuestion:
@@ -973,102 +973,276 @@ async def handle_help_command(context: TurnContext):
 
 ---
 
-## **Step 4: Test AI Question Generation (15 minutes)**
+## **Step 4: Test AI Question Generation with Bot Framework Emulator (15 minutes)**
 
-### 4.1 Test Complete Question Flow in Codespace
+### 4.1 Restart Bot with New AI Features
 ```bash
-# Restart the bot to load new features
-# Stop current bot (Ctrl+C in terminal)
-# Then restart:
+# In your Codespace terminal, stop current bot (Ctrl+C)
+# Then restart with new AI features:
 python src/app.py
 ```
 
-### 4.2 Verify Codespace is Running
-1. **Check** the PORTS tab shows port 3978 forwarded
-2. **Ensure** visibility is set to "Public"
-3. **Test** endpoint: `curl https://your-codespace-url.github.dev/`
-
-### 4.3 Test in Teams
-1. **Open** your bot in Teams
-2. **Test** the new commands:
-
+**Expected output**:
 ```
-/help
-/sample python-basics
-/enroll python-basics
-/quiz
+Bot is running on port 3978
+OpenAI API key loaded successfully
+AI Question Generator initialized
+Bot is ready with AI features!
 ```
 
-4. **Answer** the quiz question with A, B, C, or D
-5. **Check** your progress with `/profile`
+### 4.2 Connect Bot Framework Emulator
+1. **Open** Bot Framework Emulator on your local machine
+2. **Connect** to your bot: `http://localhost:3978/api/messages`
+3. **Leave** App ID and Password empty for local testing
+4. **Verify** connection shows "Connected" status
 
-### 4.4 Verify File Storage in Codespace
+### 4.3 Test AI Question Commands in Emulator
+
+Type these commands in the emulator chat:
+
+```
+🔍 Basic AI Commands:
+/help                    # Updated help with AI features
+/sample python-basics    # Preview AI-generated questions
+/enroll python-basics    # Enroll in course for personalized questions
+
+📝 Quiz Commands:
+/quiz                    # Start AI-generated quiz
+A                        # Answer multiple choice (A, B, C, or D)
+/profile                 # Check progress after quiz
+/cancel                  # Cancel active quiz if needed
+```
+
+### 4.4 Test Complete AI Question Flow
+
+1. **Enroll in course**:
+   ```
+   /enroll python-basics
+   ```
+   
+   **Expected response**:
+   ```
+   ✅ Successfully enrolled in Python Basics!
+   📚 Course: Python Basics
+   🎯 Level: Beginner
+   ⏱️ Duration: 4 weeks
+   
+   Type /quiz to start your first AI-generated quiz!
+   ```
+
+2. **Start AI quiz**:
+   ```
+   /quiz
+   ```
+   
+   **Expected response**:
+   ```
+   🤖 Generating personalized quiz for you...
+   
+   📝 Question 1 of 1
+   
+   What is the correct way to create a list in Python?
+   
+   A) list = {1, 2, 3}
+   B) list = [1, 2, 3]
+   C) list = (1, 2, 3)
+   D) list = <1, 2, 3>
+   
+   Reply with A, B, C, or D
+   ```
+
+3. **Answer the question**:
+   ```
+   B
+   ```
+   
+   **Expected response**:
+   ```
+   ✅ Correct! Well done!
+   
+   📖 Explanation: Lists in Python are created using square brackets []. 
+   Curly braces {} create sets, parentheses () create tuples, and angle 
+   brackets <> are not valid Python syntax.
+   
+   🎯 Quiz Complete!
+   📊 Score: 1/1 (100%)
+   ⭐ Perfect score! Your current streak: 1
+   
+   Type /profile to see your progress or /quiz for another question!
+   ```
+
+### 4.5 Verify Data Persistence in Codespace
+
+Check that AI-generated data is saved:
+
 ```bash
-# Check that data files are created in Codespace
-ls playground/data/users/
-ls playground/data/quizzes/
+# Check user data files
+ls playground/data/
+cat playground/data/users.json
 
-# View a user profile
-cat playground/data/users/*_profile.json
+# Check quiz sessions
+ls playground/logs/
+tail playground/logs/bot.log
+```
+
+### 4.6 Debug AI Features in Emulator
+
+The Bot Framework Emulator provides excellent debugging for AI features:
+
+1. **Inspector Panel**: See OpenAI API request/response JSON
+2. **Log Panel**: Monitor AI generation process
+3. **Network Traffic**: View API calls to OpenAI
+4. **Message History**: Review question generation flow
+
+**Debugging Commands**:
+```bash
+# In Codespace terminal, check AI logs
+tail -f playground/logs/bot.log
+
+# Test OpenAI connection manually
+python -c "
+from src.ai_question_generator import AIQuestionGenerator
+gen = AIQuestionGenerator()
+print('✅ AI Generator initialized successfully')
+"
 ```
 
 ---
 
 ## **✅ Day 3 Checklist**
 
-Verify all these work:
+Verify all these work in Bot Framework Emulator:
 
-- [ ] Created `src/sandbox_question_generator.py` with OpenAI integration
-- [ ] Created `src/sandbox_answer_evaluator.py` with intelligent feedback
+### **AI Question Generation**
+- [ ] Created `src/ai_question_generator.py` with OpenAI integration
+- [ ] Created `src/ai_answer_evaluator.py` with intelligent feedback
 - [ ] Updated `src/bot.py` with quiz functionality
-- [ ] `/sample [course]` command shows preview questions
-- [ ] `/quiz` command generates personalized questions
+- [ ] OpenAI API key working (check logs for API calls)
+- [ ] Question generation producing valid JSON responses
+
+### **Bot Framework Emulator Testing**
+- [ ] Bot connects to emulator without errors
+- [ ] `/sample [course]` command shows AI-generated preview questions
+- [ ] `/quiz` command generates personalized questions using OpenAI
 - [ ] Quiz questions display properly with multiple choice options
 - [ ] Answer evaluation works for A, B, C, D responses
+- [ ] Intelligent feedback and explanations appear
+
+### **Data Management**
 - [ ] User profile updates after answering questions
-- [ ] Feedback and performance summary display correctly
+- [ ] Quiz sessions save to local storage
+- [ ] Performance tracking working correctly
 - [ ] Quiz cancellation works with `/cancel`
-- [ ] Files are saved in `playground/data/` directories in Codespace
-- [ ] OpenAI API calls successful (check logs in Codespace terminal)
-- [ ] Port forwarding working correctly in Codespace
+- [ ] Files save properly in `playground/data/` directories
+
+### **AI Debugging**
+- [ ] Can see OpenAI API calls in emulator network panel
+- [ ] Error messages helpful if AI generation fails
+- [ ] Logs show AI processing steps
+- [ ] Question quality appropriate for course level
 
 ---
 
 ## **🚀 What's Next?**
 
-**Day 4**: We'll add advanced quiz features including adaptive difficulty, topic tracking, and detailed learning analytics - all running seamlessly in your GitHub Codespace.
+**Day 4**: We'll add advanced analytics and adaptive difficulty - perfect features to test and debug in Bot Framework Emulator where you can see all the AI decision-making process in detail.
 
 ---
 
 ## **💡 Troubleshooting**
 
-### Common Issues:
+### **OpenAI API Issues:**
 
-**OpenAI API errors:**
-- Check API key in `.env` file (not .env.sandbox)
-- Verify account has sufficient credits
-- Check rate limits (especially for free tier)
+**Issue**: "OpenAI API key not found"  
+**Solution**: 
+- Check `.env` file has `OPENAI_API_KEY=your-key`
+- Restart bot after updating environment variables
+- Verify key has no extra spaces
 
-**Codespace-specific issues:**
-- Ensure environment variables are loaded (restart bot if needed)
-- Check if port 3978 is properly forwarded
-- Verify Codespace hasn't hibernated (restart if inactive)
+**Issue**: "Rate limit exceeded"  
+**Solution**:
+- Wait a few minutes before trying again
+- Check your OpenAI usage dashboard
+- Consider upgrading to paid tier for higher limits
 
-**Question generation fails:**
-- Check OpenAI response format
+**Issue**: "API request failed"  
+**Solution**:
+- Check internet connectivity from Codespace
+- Verify OpenAI service status
+- Check API key is valid and active
+
+### **Bot Framework Emulator Issues:**
+
+**Issue**: Can't see AI responses  
+**Solution**:
+- Check console for error messages
+- Look at emulator log panel for details
+- Verify bot is processing `/quiz` command correctly
+
+**Issue**: Questions not generating  
+**Solution**:
+- Check OpenAI response in emulator network panel
+- Verify course enrollment before starting quiz
 - Look for JSON parsing errors in logs
-- Verify model name is correct (gpt-3.5-turbo)
 
-**Quiz session issues:**
-- Clear active_quizzes if bot restarts
-- Check user enrollment before starting quiz
-- Verify storage permissions
+### **Local Development Issues:**
 
-**File storage errors:**
-- Ensure `playground/data/` directories exist
-- Check write permissions
-- Monitor disk space
+**Issue**: Bot not responding to commands  
+**Solution**:
+- Restart bot after code changes
+- Check for Python syntax errors
+- Verify all imports working correctly
+
+**Issue**: Storage errors  
+**Solution**:
+- Check `playground/data/` directory exists
+- Verify write permissions in Codespace
+- Look for error messages in console
+
+### **AI Quality Issues:**
+
+**Issue**: Questions too easy/hard  
+**Solution**:
+- Adjust difficulty prompts in AI generator
+- Check user profile for correct course level
+- Review OpenAI response in emulator
+
+**Issue**: Poor question quality  
+**Solution**:
+- Review and improve OpenAI prompts
+- Check course topics are specific enough
+- Consider using different OpenAI model
+
+### **Debugging Commands:**
+
+```bash
+# Test OpenAI connection
+python -c "
+import openai
+from config import Config
+client = openai.OpenAI(api_key=Config.OPENAI_API_KEY)
+print('✅ OpenAI client created successfully')
+"
+
+# Check bot logs
+tail -f playground/logs/bot.log
+
+# Test AI generator manually
+python -c "
+from src.ai_question_generator import AIQuestionGenerator
+gen = AIQuestionGenerator()
+questions = gen.generate_questions('python-basics', 'beginner', 1)
+print('Generated questions:', len(questions))
+"
+```
+
+### **Emulator Benefits for AI Development:**
+- ✅ **See AI responses in real-time** - Debug generation process step by step
+- ✅ **Network panel** - Monitor OpenAI API calls and responses
+- ✅ **JSON inspection** - View exact question structure and format
+- ✅ **Error debugging** - Catch AI generation failures immediately
+- ✅ **Local testing** - No need for cloud deployment to test AI features
 
 ---
 
-**🎉 Success!** Your AI learning bot now generates personalized questions using OpenAI and provides intelligent feedback to learners!
+**🎉 Success!** Your AI learning bot now generates personalized questions using OpenAI and provides intelligent feedback - all testable locally in Bot Framework Emulator with excellent debugging capabilities!

@@ -1,18 +1,18 @@
-# Day 2: Bot Framework & GitHub Codespaces Deployment
+# Day 2: Bot Framework & Bot Framework Emulator Testing
 
-## 🎯 **Goal**: Create a working bot deployed in GitHub Codespaces
+## 🎯 **Goal**: Create a working bot and test it using Bot Framework Emulator
 
 **Time Required**: 45-60 minutes  
-**Prerequisites**: Day 1 completed (Codespace & Teams setup)  
-**Outcome**: Bot responding to messages in Teams via cloud deployment
+**Prerequisites**: Day 1 completed (Codespace & Bot Framework Emulator installed)  
+**Outcome**: Bot responding to messages in Bot Framework Emulator with local testing
 
 ---
 
-## **Step 1: Update Bot Configuration (10 minutes)**
+## **Step 1: Create Bot Configuration (10 minutes)**
 
 ### 1.1 Enhanced Config Class
 1. **Open**: `src/config.py`
-2. **Replace** with sandbox-optimized configuration:
+2. **Replace** with local development configuration:
 
 ```python
 """
@@ -24,36 +24,34 @@ import os
 import logging
 from dotenv import load_dotenv
 
-# Load sandbox environment
-load_dotenv('.env.sandbox')
+# Load local development environment
+load_dotenv('.env')
 
 class Config:
-    """Sandbox-optimized Bot Configuration"""
+    """Bot Framework Emulator Configuration"""
 
     # Server Configuration
     PORT = int(os.environ.get("PORT", 3978))
     
-    # Bot Configuration
+    # Bot Configuration (for local testing, these can be dummy values)
     APP_ID = os.environ.get("BOT_ID", "")
     APP_PASSWORD = os.environ.get("BOT_PASSWORD", "")
-    APP_TYPE = os.environ.get("BOT_TYPE", "")
-    APP_TENANTID = os.environ.get("BOT_TENANT_ID", "")
     
     # OpenAI Configuration
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
     OPENAI_MODEL_NAME = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
     
-    # Sandbox Configuration
-    ENVIRONMENT = os.environ.get("ENVIRONMENT", "sandbox")
+    # Local Development Configuration
+    ENVIRONMENT = os.environ.get("ENVIRONMENT", "local-development")
     STORAGE_TYPE = os.environ.get("STORAGE_TYPE", "file")
     DATA_DIRECTORY = os.environ.get("DATA_DIRECTORY", "playground/data")
     LOG_DIRECTORY = os.environ.get("LOG_DIRECTORY", "playground/logs")
     
     @staticmethod
     def validate_environment():
-        """Validate sandbox environment configuration"""
+        """Validate local development environment configuration"""
         missing = []
-        required_vars = ["BOT_ID", "BOT_PASSWORD", "OPENAI_API_KEY"]
+        required_vars = ["OPENAI_API_KEY"]  # BOT_ID and BOT_PASSWORD not required for emulator
         
         for var in required_vars:
             if not os.environ.get(var):
@@ -61,14 +59,14 @@ class Config:
         
         if missing:
             print(f"❌ Missing required environment variables: {', '.join(missing)}")
-            print("Please update your .env.sandbox file with the missing values.")
+            print("Please update your .env file with the missing values.")
             return False
         
         # Environment-specific validations
         env = Config.ENVIRONMENT.lower()
-        if env == "sandbox":
-            print("✅ Sandbox environment detected")
-            print(f"   Bot ID: {Config.APP_ID[:8]}...")
+        if env == "local-development":
+            print("✅ Local development environment detected")
+            print(f"   Bot ID: {Config.APP_ID or 'Using emulator defaults'}")
             print(f"   OpenAI Model: {Config.OPENAI_MODEL_NAME}")
             print(f"   Storage Type: {Config.STORAGE_TYPE}")
             print(f"   Data Directory: {Config.DATA_DIRECTORY}")
@@ -77,7 +75,7 @@ class Config:
     
     @staticmethod
     def setup_logging():
-        """Set up logging for sandbox environment"""
+        """Set up logging for local development"""
         os.makedirs(Config.LOG_DIRECTORY, exist_ok=True)
         
         logging.basicConfig(
@@ -93,7 +91,7 @@ class Config:
 ```
 
 ### 1.2 Test Configuration
-```powershell
+```bash
 # Test the updated configuration
 python -c "
 from src.config import Config
@@ -106,10 +104,10 @@ else:
 
 ---
 
-## **Step 2: Create Sandbox Storage System (15 minutes)**
+## **Step 2: Create Local Storage System (15 minutes)**
 
-### 2.1 Create SandboxStorage Class
-1. **Create**: `src/sandbox_storage.py`
+### 2.1 Create Local Storage Class
+1. **Create**: `src/local_storage.py`
 
 ```python
 import os
@@ -148,6 +146,149 @@ class QuizSession:
     questions: List[Dict[str, Any]]
     answers: List[str]
     score: int
+    completed_date: str
+
+class LocalStorage:
+    """File-based storage for local development"""
+    
+    def __init__(self, data_directory: str = "playground/data"):
+        self.data_dir = data_directory
+        self.users_file = os.path.join(data_directory, "users.json")
+        self.sessions_file = os.path.join(data_directory, "quiz_sessions.json")
+        self.courses_file = os.path.join(data_directory, "courses.json")
+        
+        # Ensure directory exists
+        os.makedirs(data_directory, exist_ok=True)
+        
+        # Initialize files if they don't exist
+        self._initialize_files()
+        
+        self.logger = logging.getLogger(__name__)
+    
+    def _initialize_files(self):
+        """Initialize storage files with empty data"""
+        files_data = {
+            self.users_file: {},
+            self.sessions_file: [],
+            self.courses_file: {
+                "python-basics": {
+                    "name": "Python Basics",
+                    "description": "Learn fundamental Python programming concepts",
+                    "difficulty": "beginner",
+                    "estimated_duration": "4 weeks",
+                    "topics": ["variables", "functions", "loops", "data structures"]
+                },
+                "javascript-fundamentals": {
+                    "name": "JavaScript Fundamentals", 
+                    "description": "Master core JavaScript concepts",
+                    "difficulty": "beginner",
+                    "estimated_duration": "3 weeks",
+                    "topics": ["variables", "functions", "objects", "arrays", "DOM"]
+                }
+            }
+        }
+        
+        for file_path, default_data in files_data.items():
+            if not os.path.exists(file_path):
+                with open(file_path, 'w') as f:
+                    json.dump(default_data, f, indent=2)
+    
+    def _load_json_file(self, file_path: str) -> Any:
+        """Load and parse JSON file"""
+        try:
+            with open(file_path, 'r') as f:
+                return json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            self.logger.error(f"Error loading {file_path}: {e}")
+            return {} if file_path != self.sessions_file else []
+    
+    def _save_json_file(self, file_path: str, data: Any) -> bool:
+        """Save data to JSON file"""
+        try:
+            with open(file_path, 'w') as f:
+                json.dump(data, f, indent=2)
+            return True
+        except Exception as e:
+            self.logger.error(f"Error saving {file_path}: {e}")
+            return False
+    
+    def get_user_profile(self, user_id: str) -> Optional[UserProfile]:
+        """Get user profile by ID"""
+        users = self._load_json_file(self.users_file)
+        user_data = users.get(user_id)
+        
+        if user_data:
+            return UserProfile(**user_data)
+        return None
+    
+    def save_user_profile(self, profile: UserProfile) -> bool:
+        """Save user profile"""
+        users = self._load_json_file(self.users_file)
+        users[profile.user_id] = asdict(profile)
+        return self._save_json_file(self.users_file, users)
+    
+    def enroll_user(self, user_id: str, course_id: str) -> bool:
+        """Enroll user in a course"""
+        profile = self.get_user_profile(user_id)
+        
+        if not profile:
+            profile = UserProfile(
+                user_id=user_id,
+                enrolled_course=course_id,
+                start_date=datetime.now().isoformat()
+            )
+        else:
+            profile.enrolled_course = course_id
+            profile.start_date = datetime.now().isoformat()
+        
+        return self.save_user_profile(profile)
+    
+    def get_available_courses(self) -> Dict[str, Any]:
+        """Get all available courses"""
+        return self._load_json_file(self.courses_file)
+    
+    def save_quiz_session(self, session: QuizSession) -> bool:
+        """Save completed quiz session"""
+        sessions = self._load_json_file(self.sessions_file)
+        sessions.append(asdict(session))
+        return self._save_json_file(self.sessions_file, sessions)
+    
+    def get_user_sessions(self, user_id: str) -> List[QuizSession]:
+        """Get all quiz sessions for a user"""
+        sessions = self._load_json_file(self.sessions_file)
+        user_sessions = [s for s in sessions if s.get('user_id') == user_id]
+        return [QuizSession(**session) for session in user_sessions]
+    
+    def update_user_stats(self, user_id: str, correct_answers: int, total_questions: int) -> bool:
+        """Update user statistics after quiz"""
+        profile = self.get_user_profile(user_id)
+        if not profile:
+            return False
+        
+        profile.total_questions += total_questions
+        profile.correct_answers += correct_answers
+        profile.last_quiz_date = datetime.now().isoformat()
+        
+        # Update streak
+        if correct_answers == total_questions:
+            profile.current_streak += 1
+            profile.longest_streak = max(profile.longest_streak, profile.current_streak)
+        else:
+            profile.current_streak = 0
+        
+        return self.save_user_profile(profile)
+```
+
+### 2.2 Test Storage System
+```bash
+# Test the storage system
+python -c "
+from src.local_storage import LocalStorage
+storage = LocalStorage()
+print('✅ Storage system initialized')
+print('Available courses:', list(storage.get_available_courses().keys()))
+"
+```
     completed_date: str
     time_taken: int  # seconds
 
@@ -676,7 +817,7 @@ ngrok http 3978
 
 ---
 
-## **Step 5: Test Bot in Teams (10 minutes)**
+## **Step 5: Test Bot with Bot Framework Emulator (15 minutes)**
 
 ### 5.1 Start the Bot in Codespace
 ```bash
@@ -691,73 +832,362 @@ Bot is ready!
 Listening for messages...
 ```
 
-### 5.2 Verify Port Forwarding
-1. **Check** the PORTS tab shows port 3978 forwarded as public
-2. **Visit** your Codespace URL in browser: `https://your-url.github.dev/`
-3. **Should see**: "Bot is running!"
+### 5.2 Connect Bot Framework Emulator
+1. **Open** Bot Framework Emulator on your local machine
+2. **Click** "Open Bot" or "Create a new bot configuration"
+3. **Enter Bot URL**: `http://localhost:3978/api/messages`
+4. **Leave** Microsoft App ID and Password **empty** (for local testing)
+5. **Click** "Connect"
 
-### 5.3 Install Bot in Teams
-1. **Go to**: Teams Developer Portal
-2. **Navigate** to: Preview in Teams
-3. **Click** "Preview in Teams"
-4. **Click** "Add" to install the bot
-5. **Start chatting** with your bot!
+**💡 Important**: For local development with emulator, you don't need real Microsoft App credentials. Leave the App ID and Password fields empty.
 
-### 5.4 Test Bot Commands
-Try these commands in Teams:
+### 5.3 Test Basic Bot Commands
+Type these commands in the emulator chat window:
+
 ```
-/help
-/status
-/enroll python-basics
-/profile
-/admin
+🔍 Basic Commands:
+/help              # Show available commands
+/status            # Check bot status
+
+👤 User Commands:
+/enroll python-basics    # Enroll in course
+/profile                 # View user profile
+/progress               # Show learning progress
+
+🔧 Admin Commands:
+/admin                  # Admin panel
+/stats                  # System statistics
 ```
 
-**✅ Success**: Your bot is now running in GitHub Codespaces and responding in Teams!
+### 5.4 Verify Bot Responses
+You should see responses like:
+
+**For `/help` command:**
+```
+🤖 AI Learning Bot Commands:
+
+📚 Learning:
+/enroll [course] - Enroll in a course
+/quiz - Start daily quiz (coming in Day 3)
+/progress - View your progress
+
+👤 Profile:
+/profile - View your learning profile
+/settings - Update preferences
+
+ℹ️ Information:
+/help - Show this help
+/status - Bot status
+```
+
+**For `/enroll python-basics`:**
+```
+✅ Successfully enrolled in Python Basics!
+
+📚 Course: Python Basics  
+🎯 Level: Beginner
+⏱️ Duration: 4 weeks
+📝 Daily quizzes will be available starting Day 3
+
+Type /profile to view your enrollment details!
+```
+
+### 5.5 Debug Features in Emulator
+The Bot Framework Emulator provides excellent debugging capabilities:
+
+1. **Inspector Panel**: See message JSON structure
+2. **Log Panel**: View detailed bot logs
+3. **Conversation History**: Navigate through message history
+4. **Network Traffic**: Monitor HTTP requests/responses
+
+**✅ Success Indicators:**
+- Bot connects without errors
+- All commands respond appropriately
+- User enrollment saves successfully
+- Profile shows correct information
+- No error messages in console or emulator
 
 ---
 
 ## **✅ Day 2 Checklist**
 
-Verify all these work:
+Verify all these work in Bot Framework Emulator:
 
+### **Development Environment**
 - [ ] GitHub Codespace is running with all project files
-- [ ] Updated `src/config.py` with sandbox configuration
-- [ ] Created `src/sandbox_storage.py` with file-based storage
-- [ ] Updated `src/bot.py` with sandbox-optimized logic
-- [ ] Port 3978 forwarded and publicly accessible in Codespace
-- [ ] Bot endpoint updated in Teams Developer Portal
-- [ ] Bot running in Codespace without errors
-- [ ] Bot installed and responding in Teams
-- [ ] All commands work: `/help`, `/enroll`, `/profile`, `/status`
-- [ ] User enrollment and profile storage working
+- [ ] Updated `src/config.py` with local development configuration
+- [ ] Created `src/local_storage.py` with file-based storage
+- [ ] Bot starts without errors in Codespace
+- [ ] Environment variables loaded correctly
+
+### **Bot Framework Emulator Testing**
+- [ ] Bot Framework Emulator installed and launched
+- [ ] Bot connects to emulator without errors
+- [ ] Bot responds to `/help` command with command list
+- [ ] User can enroll with `/enroll python-basics`
+- [ ] Profile shows enrollment with `/profile`
+- [ ] Status command shows bot information
+- [ ] All commands work without errors
+
+### **Data Persistence**
+- [ ] User enrollment saves to local files
+- [ ] Profile information persists between conversations
 - [ ] Playground directory contains user data files
+- [ ] Logs being written to `playground/logs/`
+- [ ] Configuration validation passes
+
+### **Debugging Capabilities**
+- [ ] Can see conversation JSON in emulator
+- [ ] Bot logs appear in emulator log panel
+- [ ] Message flow is clear and debuggable
+- [ ] No error messages in console
 
 ---
 
 ## **🚀 What's Next?**
 
-**Day 3**: We'll add AI-powered question generation using OpenAI, creating the foundation for personalized quizzes - all running smoothly in your GitHub Codespace.
+**Day 3**: We'll add AI-powered question generation using OpenAI. The Bot Framework Emulator is perfect for testing AI features because you can see the full conversation flow and debug any issues with the AI responses.
 
 ---
 
 ## **💡 Troubleshooting**
 
-### Common Issues:
+### **Bot Framework Emulator Issues:**
 
+**Issue**: Emulator won't connect to bot  
+**Solution**: 
+- Verify bot is running on port 3978
+- Check URL is `http://localhost:3978/api/messages`
+- Leave App ID and Password empty
+- Try restarting both bot and emulator
+
+**Issue**: Bot not responding to commands  
+**Solution**:
+- Check console for error messages
+- Verify bot.py handles message routing correctly
+- Check environment variables are loaded
+- Look at emulator log panel for details
+
+**Issue**: "Connection refused" error  
+**Solution**:
+- Ensure port 3978 is forwarded in Codespace
+- Check bot is actually listening on port 3978
+- Verify no firewall blocking the connection
+
+### **Configuration Issues:**
+
+**Issue**: Environment variables not loading  
+**Solution**:
+- Check `.env` file exists and has correct syntax
+- Verify no extra spaces in environment variables
+- Test with `Config.validate_environment()`
+
+**Issue**: Storage errors  
+**Solution**:
+- Check `playground/data` directory exists
+- Verify write permissions in Codespace
+- Look for error logs in `playground/logs/`
+
+### **Codespace Issues:**
+
+**Issue**: Port forwarding not working  
+**Solution**:
+- Check PORTS tab in Codespace
+- Manually add port 3978 if not forwarded
+- Set port visibility to "Public" if needed
+
+**Issue**: Bot crashes on startup  
+**Solution**:
+- Check requirements.txt dependencies installed
+- Verify Python syntax in all files
+- Look at console error messages
+
+### **Testing Commands:**
+
+```bash
+# Check if bot is running
+ps aux | grep python
+
+# Test bot endpoint
+curl http://localhost:3978/
+
+# Check port status
+ss -tlnp | grep 3978
+
+# Verify environment loading
+python -c "from src.config import Config; Config.validate_environment()"
+
+# Test storage system
+python -c "from src.local_storage import LocalStorage; print('Storage OK')"
+```
+
+### **Emulator Benefits for Learning:**
+- ✅ **No subscription required** - Works completely offline
+- ✅ **Perfect debugging** - See every message and response
+- ✅ **Easy testing** - Instant feedback on your bot logic
+- ✅ **JSON inspection** - Understand bot framework message structure
+- ✅ **Local development** - No network dependencies
+
+---
+
+**🎉 Success!** Your AI learning bot is now running locally and responding to commands in Bot Framework Emulator. You have a solid foundation for adding AI-powered features without any external dependencies or subscription requirements!
+```bash
+# In your Codespace terminal
+python src/app.py
+```
+
+#### C.2 Test via Azure Portal
+1. **Go to**: Azure Portal → Your Bot Resource
+2. **Click** "Test in Web Chat"
+3. **Update** messaging endpoint to your Codespace URL
+4. **Test** the bot directly in Azure
+
+#### C.3 Enable Additional Channels
+From Azure Portal, you can connect to:
+- Microsoft Teams (when available)
+- Slack
+- Facebook Messenger
+- Direct Line (for custom apps)
+
+### **Universal Testing Commands**
+
+Regardless of your testing method, try these commands:
+
+```
+🔍 Basic Commands:
+/help              # Show available commands
+/status            # Check bot status
+
+👤 User Commands:
+/enroll python-basics    # Enroll in course
+/profile                 # View user profile
+/progress               # Show learning progress
+
+🔧 Admin Commands:
+/admin                  # Admin panel
+/stats                  # System statistics
+/logs                   # Recent activity
+```
+
+### **Testing Validation Checklist**
+
+Verify these work in your chosen testing environment:
+
+- [ ] Bot responds to `/help` command
+- [ ] User can enroll with `/enroll python-basics`
+- [ ] Profile shows enrollment with `/profile`
+- [ ] Status command shows bot information
+- [ ] Admin commands work (if configured)
+- [ ] User data persists between conversations
+- [ ] Error messages are user-friendly
+
+### **Expected Responses**
+
+**For `/help` command:**
+```
+🤖 AI Learning Bot Commands:
+
+📚 Learning:
+/enroll [course] - Enroll in a course
+/quiz - Start daily quiz
+/progress - View your progress
+
+👤 Profile:
+/profile - View your learning profile
+/settings - Update preferences
+
+ℹ️ Information:
+/help - Show this help
+/status - Bot status
+```
+
+**For `/enroll python-basics`:**
+```
+✅ Successfully enrolled in Python Basics!
+
+📚 Course: Python Basics
+🎯 Level: Beginner
+⏱️ Duration: 4 weeks
+📝 Daily quizzes available
+
+Type /quiz to start your first quiz!
+```
+
+---
+
+## **✅ Day 2 Checklist**
+
+Verify based on your testing approach:
+
+### **Common Requirements (All Setups)**
+- [ ] GitHub Codespace is running with all project files
+- [ ] Updated `src/config.py` with appropriate configuration
+- [ ] Created `src/sandbox_storage.py` with file-based storage
+- [ ] Updated `src/bot.py` with framework logic
+- [ ] Bot starts without errors in Codespace
+- [ ] Environment variables loaded correctly
+
+### **Setup A: Teams Testing**
+- [ ] Port 3978 forwarded and publicly accessible in Codespace
+- [ ] Bot endpoint updated in Teams Developer Portal
+- [ ] Bot installed and responding in Teams
+- [ ] All commands work in Teams chat
+
+### **Setup B: Bot Framework Emulator**
+- [ ] Bot Framework Emulator installed and connected
+- [ ] Bot responds to commands in emulator
+- [ ] Can see message JSON and debug info
+- [ ] Local testing working properly
+
+### **Setup C: Azure Bot Service**
+- [ ] Azure Bot resource configured
+- [ ] Messaging endpoint updated in Azure Portal
+- [ ] Web Chat testing works
+- [ ] Bot responds in Azure test interface
+
+### **Data Verification (All Setups)**
+- [ ] User enrollment and profile storage working
+- [ ] Playground directory contains user data files
+- [ ] Logs being written to `playground/logs/`
+- [ ] Configuration validation passes
+
+---
+
+## **🚀 What's Next?**
+
+**Day 3**: We'll add AI-powered question generation using OpenAI. This works identically across all testing environments - the AI features are the same whether you're testing in Teams, Emulator, or Azure Bot Service.
+
+---
+
+## **💡 Troubleshooting**
+
+### **Teams Testing Issues:**
 **Bot not responding in Teams:**
 - Check Codespace port 3978 is forwarded and public
 - Verify endpoint URL in Teams Developer Portal
 - Ensure bot is running without errors in Codespace
 
-**Codespace issues:**
-- Restart Codespace if unresponsive
-- Check GitHub account status and billing
-- Verify devcontainer.json configuration
+### **Bot Framework Emulator Issues:**
+**Emulator won't connect:**
+- Check bot is running on localhost:3978
+- Verify endpoint URL: `http://localhost:3978/api/messages`
+- Leave App ID/Password empty for local testing
 
+**Messages not showing:**
+- Check console for errors
+- Verify bot configuration
+- Try restarting both bot and emulator
+
+### **Azure Bot Service Issues:**
+**Web Chat not working:**
+- Verify messaging endpoint in Azure Portal
+- Check bot credentials match Azure registration
+- Ensure Codespace URL is public and accessible
+
+### **Common Issues (All Setups):**
 **Environment variable errors:**
-- Verify `.env` has all required values
-- Check BOT_ID and BOT_PASSWORD are correct
+- Verify `.env` has all required values based on your setup
+- Check BOT_ID and BOT_PASSWORD match your registration
 - Ensure OpenAI API key is valid
 
 **Storage errors:**
@@ -765,23 +1195,37 @@ Verify all these work:
 - Verify write permissions in cloud environment
 - Look for error logs in `playground/logs/`
 
-**Port forwarding issues:**
-- Set port 3978 visibility to "Public" in PORTS tab
-- Update endpoint URL in Teams Developer Portal with new Codespace URL
-- Restart port forwarding if connection fails
+**Codespace issues:**
+- Restart Codespace if unresponsive
+- Check GitHub account status and billing
+- Verify devcontainer.json configuration
 
-### Codespace-Specific Commands:
+### **Testing Commands by Environment:**
+
+**Codespace Terminal:**
 ```bash
 # Check running services
 ps aux | grep python
 
 # Test bot endpoint
-curl https://your-codespace-url.github.dev/
+curl http://localhost:3978/
 
 # Check port status
 ss -tlnp | grep 3978
 ```
 
+**Teams Testing:**
+```bash
+# Test public endpoint
+curl https://your-codespace-url.github.dev/
+```
+
+**Local Testing:**
+```bash
+# Test local endpoint
+curl http://localhost:3978/api/messages
+```
+
 ---
 
-**🎉 Success!** Your AI learning bot is now running in GitHub Codespaces and responding to commands in Teams. No firewall restrictions, no local setup required!
+**🎉 Success!** Your AI learning bot is now running locally and responding to commands in Bot Framework Emulator. You have a solid foundation for adding AI-powered features without any external dependencies or subscription requirements!

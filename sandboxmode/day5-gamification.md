@@ -1,10 +1,10 @@
-# Day 5: Achievements & Gamification (Codespaces)
+# Day 5: Achievements & Gamification with Bot Framework Emulator
 
-## 🎯 **Goal**: Implement achievement badges, course completion certificates, and gamification features
+## 🎯 **Goal**: Implement achievement badges, course completion certificates, and gamification features testable in Bot Framework Emulator
 
 **Time Required**: 80-95 minutes  
-**Prerequisites**: Day 1-4 completed (Codespace with analytics)  
-**Outcome**: Engaging gamified learning platform with achievements and rewards in cloud
+**Prerequisites**: Day 1-4 completed (Codespace with analytics, Bot Framework Emulator connected)  
+**Outcome**: Engaging gamified learning platform with achievements and rewards - fully testable locally
 
 ---
 

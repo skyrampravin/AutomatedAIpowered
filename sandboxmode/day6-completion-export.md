@@ -1,10 +1,10 @@
-# Day 6: Course Completion & Data Export (Codespaces)
+# Day 6: Course Completion & Data Export with Bot Framework Emulator
 
-## 🎯 **Goal**: Implement course completion certificates, progress export, and prepare for production features
+## 🎯 **Goal**: Implement course completion certificates, progress export, and local data management testable in Bot Framework Emulator
 
 **Time Required**: 75-90 minutes  
-**Prerequisites**: Day 1-5 completed (Codespace with gamification)  
-**Outcome**: Complete learning platform with certificates and data portability in cloud
+**Prerequisites**: Day 1-5 completed (Codespace with gamification, Bot Framework Emulator)  
+**Outcome**: Complete learning platform with certificates and local data export - fully testable locally
 
 ---
 
