@@ -289,6 +289,51 @@ print('✅ Storage system initialized')
 print('Available courses:', list(storage.get_available_courses().keys()))
 "
 ```
+
+---
+
+## **Step 3: Create Sandbox Storage System (15 minutes)**
+
+### 3.1 Create Sandbox Storage Class
+1. **Create**: `src/sandbox_storage.py`
+
+```python
+import os
+import json
+import logging
+from datetime import datetime
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass, asdict
+
+@dataclass
+class UserProfile:
+    user_id: str
+    enrolled_course: Optional[str] = None
+    start_date: Optional[str] = None
+    total_questions: int = 0
+    correct_answers: int = 0
+    current_streak: int = 0
+    longest_streak: int = 0
+    last_quiz_date: Optional[str] = None
+    completed_course: bool = False
+    preferences: Dict[str, Any] = None
+    
+    def __post_init__(self):
+        if self.preferences is None:
+            self.preferences = {
+                "difficulty": "medium",
+                "notifications": True,
+                "quiz_time": "09:00"
+            }
+
+@dataclass
+class QuizSession:
+    session_id: str
+    user_id: str
+    course: str
+    questions: List[Dict[str, Any]]
+    answers: List[str]
+    score: int
     completed_date: str
     time_taken: int  # seconds
 
@@ -467,9 +512,9 @@ class SandboxStorage:
             return {}
 ```
 
-### 2.2 Test Storage System
-```powershell
-# Test the storage system
+### 3.2 Test Sandbox Storage System
+```bash
+# Test the sandbox storage system
 python -c "
 from src.sandbox_storage import SandboxStorage, UserProfile
 from src.config import Config
@@ -493,9 +538,9 @@ print(f'Stats: {stats}')
 
 ---
 
-## **Step 3: Update Bot Logic for Sandbox (15 minutes)**
+## **Step 4: Update Bot Logic for Sandbox (15 minutes)**
 
-### 3.1 Enhanced Bot Implementation
+### 4.1 Enhanced Bot Implementation
 1. **Replace** `src/bot.py` content:
 
 ```python
@@ -780,15 +825,15 @@ Ready to start learning? Try: `/enroll python-basics`
 
 ---
 
-## **Step 4: Set Up Codespace Port Forwarding (5 minutes)**
+## **Step 5: Set Up Codespace Port Forwarding (5 minutes)**
 
-### 4.1 Start Port Forwarding
+### 5.1 Start Port Forwarding
 ```bash
 # In your Codespace terminal, start the bot
 python src/app.py
 ```
 
-### 4.2 Configure Port Forwarding
+### 5.2 Configure Port Forwarding
 1. **In Codespace**, look for "PORTS" tab at bottom of VS Code
 2. **If port 3978 isn't listed**, click "Add Port" 
 3. **Enter**: `3978`
@@ -805,21 +850,33 @@ If you prefer ngrok, Codespaces has it pre-installed:
 ngrok http 3978
 ```
 
-### 4.3 Update Teams Developer Portal
-1. **Go back** to: https://dev.teams.microsoft.com/
-2. **Navigate** to your app → App features → Bot
-3. **Update** "Messaging endpoint":
+### 5.3 Verify Bot is Running
+1. **Check** that your bot is running in the terminal:
+   ```bash
+   # You should see output like:
+   # ✅ Local development environment detected
+   # Bot is running on port 3978
+   # Bot is ready!
    ```
-   https://your-codespace-url.github.dev/api/messages
+
+2. **Test the endpoint** (optional):
+   ```bash
+   # In a new terminal, test if the bot endpoint responds
+   curl http://localhost:3978/api/messages
+   # Should return: Method Not Allowed (405) - this is expected
    ```
-   **Or** if using ngrok: `https://abc123.ngrok.io/api/messages`
-4. **Click** "Save"
+
+3. **Note your bot URL** for the emulator:
+   - **Local testing**: `http://localhost:3978/api/messages`
+   - **Codespace forwarded**: `https://your-codespace-url.github.dev/api/messages`
+
+**💡 Important**: For Bot Framework Emulator testing, you don't need to configure any external services like Teams Developer Portal. The emulator connects directly to your local bot.
 
 ---
 
-## **Step 5: Test Bot with Bot Framework Emulator (15 minutes)**
+## **Step 6: Test Bot with Bot Framework Emulator (15 minutes)**
 
-### 5.1 Start the Bot in Codespace
+### 6.1 Start the Bot in Codespace
 ```bash
 # In your Codespace terminal
 python src/app.py
@@ -832,7 +889,7 @@ Bot is ready!
 Listening for messages...
 ```
 
-### 5.2 Connect Bot Framework Emulator
+### 6.2 Connect Bot Framework Emulator
 1. **Open** Bot Framework Emulator on your local machine
 2. **Click** "Open Bot" or "Create a new bot configuration"
 3. **Enter Bot URL**: `http://localhost:3978/api/messages`
@@ -841,7 +898,7 @@ Listening for messages...
 
 **💡 Important**: For local development with emulator, you don't need real Microsoft App credentials. Leave the App ID and Password fields empty.
 
-### 5.3 Test Basic Bot Commands
+### 6.3 Test Basic Bot Commands
 Type these commands in the emulator chat window:
 
 ```
@@ -859,7 +916,7 @@ Type these commands in the emulator chat window:
 /stats                  # System statistics
 ```
 
-### 5.4 Verify Bot Responses
+### 6.4 Verify Bot Responses
 You should see responses like:
 
 **For `/help` command:**
@@ -892,7 +949,7 @@ You should see responses like:
 Type /profile to view your enrollment details!
 ```
 
-### 5.5 Debug Features in Emulator
+### 6.5 Debug Features in Emulator
 The Bot Framework Emulator provides excellent debugging capabilities:
 
 1. **Inspector Panel**: See message JSON structure
