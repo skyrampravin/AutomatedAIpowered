@@ -72,3 +72,92 @@ OSError: [Errno 10048] error while attempting to bind on address ('127.0.0.1', 3
 2025-09-18 15:03:09,907 - aiohttp.access - INFO - ::1 [18/Sep/2025:15:03:09 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
 2025-09-18 15:03:22,465 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /help
 2025-09-18 15:03:22,474 - aiohttp.access - INFO - ::1 [18/Sep/2025:15:03:22 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:37:18,532 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:37:18 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:37:24,540 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /help
+2025-09-18 20:37:24,548 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:37:24 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:37:53,039 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /enroll python-basics
+2025-09-18 20:37:53,045 - sandbox_storage - INFO - User 0c044457-e1d5-491b-b01b-48af2ba097dd enrolled in course python-basics
+2025-09-18 20:37:53,062 - config - INFO - User 0c044457-e1d5-491b-b01b-48af2ba097dd enrolled in python-basics
+2025-09-18 20:37:53,063 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:37:53 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:38:01,670 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /profile
+2025-09-18 20:38:01,678 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:38:01 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:38:06,374 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /help
+2025-09-18 20:38:06,381 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:38:06 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:38:11,744 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /quiz
+2025-09-18 20:38:13,001 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:38:13,002 - openai._base_client - INFO - Retrying request to /chat/completions in 0.473306 seconds
+2025-09-18 20:38:14,741 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:38:14,742 - openai._base_client - INFO - Retrying request to /chat/completions in 0.761048 seconds
+2025-09-18 20:38:15,969 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:38:15,972 - sandbox_question_generator - WARNING - OpenAI API error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}. Using fallback question.
+2025-09-18 20:38:15,972 - sandbox_question_generator - INFO - Generated question for user 0c044457-e1d5-491b-b01b-48af2ba097dd, course python-basics, topic Object-Oriented Programming Basics
+2025-09-18 20:38:15,982 - config - INFO - Quiz question sent to user 0c044457-e1d5-491b-b01b-48af2ba097dd
+2025-09-18 20:38:15,985 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:38:11 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:38:48,633 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): A
+2025-09-18 20:38:48,638 - sandbox_answer_evaluator - INFO - Evaluated answer for user 0c044457-e1d5-491b-b01b-48af2ba097dd: Correct
+2025-09-18 20:38:48,649 - config - INFO - Quiz completed by user 0c044457-e1d5-491b-b01b-48af2ba097dd: Correct
+2025-09-18 20:38:48,671 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:38:48 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:39:03,804 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /quiz
+2025-09-18 20:39:04,250 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:39:04,252 - openai._base_client - INFO - Retrying request to /chat/completions in 0.376112 seconds
+2025-09-18 20:39:05,020 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:39:05,022 - openai._base_client - INFO - Retrying request to /chat/completions in 0.951458 seconds
+2025-09-18 20:39:06,344 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:39:06,346 - sandbox_question_generator - WARNING - OpenAI API error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}. Using fallback question.
+2025-09-18 20:39:06,347 - sandbox_question_generator - INFO - Generated question for user 0c044457-e1d5-491b-b01b-48af2ba097dd, course python-basics, topic String Manipulation
+2025-09-18 20:39:06,354 - config - INFO - Quiz question sent to user 0c044457-e1d5-491b-b01b-48af2ba097dd
+2025-09-18 20:39:06,356 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:39:03 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:39:12,052 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): B
+2025-09-18 20:39:12,055 - sandbox_answer_evaluator - INFO - Evaluated answer for user 0c044457-e1d5-491b-b01b-48af2ba097dd: Incorrect
+2025-09-18 20:39:12,075 - config - INFO - Quiz completed by user 0c044457-e1d5-491b-b01b-48af2ba097dd: Incorrect
+2025-09-18 20:39:12,076 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:39:12 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:44:27,849 - config - INFO - Message from User (0c044457-e1d5-491b-b01b-48af2ba097dd): /quiz
+2025-09-18 20:44:28,716 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:44:28,718 - openai._base_client - INFO - Retrying request to /chat/completions in 0.448613 seconds
+2025-09-18 20:44:29,507 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:44:29,508 - openai._base_client - INFO - Retrying request to /chat/completions in 0.817314 seconds
+2025-09-18 20:44:30,669 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-09-18 20:44:30,671 - sandbox_question_generator - WARNING - OpenAI API error: Error code: 429 - {'error': {'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.', 'type': 'insufficient_quota', 'param': None, 'code': 'insufficient_quota'}}. Using fallback question.
+2025-09-18 20:44:30,672 - sandbox_question_generator - INFO - Generated question for user 0c044457-e1d5-491b-b01b-48af2ba097dd, course python-basics, topic Error Handling
+2025-09-18 20:44:30,679 - config - INFO - Quiz question sent to user 0c044457-e1d5-491b-b01b-48af2ba097dd
+2025-09-18 20:44:30,681 - aiohttp.access - INFO - ::1 [18/Sep/2025:20:44:27 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 20:47:05,476 - asyncio - ERROR - unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-1' coro=<_run_app() done, defined at C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py:303> exception=OSError(10048, "error while attempting to bind on address ('127.0.0.1', 3978): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted")>
+Traceback (most recent call last):
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 544, in run_app
+    loop.run_until_complete(main_task)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 448, in _run_app
+    await site.start()
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web_runner.py", line 119, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 1630, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('127.0.0.1', 3978): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
+2025-09-18 20:48:12,512 - asyncio - ERROR - unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-1' coro=<_run_app() done, defined at C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py:303> exception=OSError(10048, "error while attempting to bind on address ('::1', 3978, 0, 0): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted")>
+Traceback (most recent call last):
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 544, in run_app
+    loop.run_until_complete(main_task)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 448, in _run_app
+    await site.start()
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web_runner.py", line 119, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 1630, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('::1', 3978, 0, 0): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
