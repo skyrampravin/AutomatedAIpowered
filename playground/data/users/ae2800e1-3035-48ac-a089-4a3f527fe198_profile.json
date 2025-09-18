@@ -1,0 +1,16 @@
+{
+  "user_id": "ae2800e1-3035-48ac-a089-4a3f527fe198",
+  "enrolled_course": "python-basics",
+  "start_date": "2025-09-18T14:39:05.005306",
+  "total_questions": 0,
+  "correct_answers": 0,
+  "current_streak": 0,
+  "longest_streak": 0,
+  "last_quiz_date": null,
+  "completed_course": false,
+  "preferences": {
+    "difficulty": "medium",
+    "notifications": true,
+    "quiz_time": "09:00"
+  }
+}

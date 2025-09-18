@@ -2,5 +2,5 @@ python-dotenv
 aiohttp
 botbuilder-core>=4.15.0
 botbuilder-schema>=4.15.0
-teams-ai>=1.6.0,<2.0.0
 python-pptx
+openai>=1.0.0

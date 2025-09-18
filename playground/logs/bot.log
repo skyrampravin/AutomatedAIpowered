@@ -1,0 +1,74 @@
+2025-09-18 13:06:03,839 - aiohttp.access - INFO - ::1 [18/Sep/2025:13:06:03 +0530] "GET / HTTP/1.1" 404 175 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0"
+2025-09-18 13:06:03,919 - aiohttp.access - INFO - ::1 [18/Sep/2025:13:06:03 +0530] "GET /favicon.ico HTTP/1.1" 404 175 "http://localhost:3978/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0"
+2025-09-18 13:08:09,463 - asyncio - ERROR - unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-1' coro=<_run_app() done, defined at C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py:303> exception=OSError(10048, "error while attempting to bind on address ('::1', 3978, 0, 0): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted")>
+Traceback (most recent call last):
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 544, in run_app
+    loop.run_until_complete(main_task)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 448, in _run_app
+    await site.start()
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web_runner.py", line 119, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 1630, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('::1', 3978, 0, 0): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
+2025-09-18 13:10:45,372 - aiohttp.access - INFO - ::1 [18/Sep/2025:13:10:45 +0530] "POST /api/messages HTTP/1.1" 500 188 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 13:10:55,921 - aiohttp.access - INFO - ::1 [18/Sep/2025:13:10:55 +0530] "POST /api/messages HTTP/1.1" 500 188 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 13:11:08,549 - aiohttp.access - INFO - ::1 [18/Sep/2025:13:11:08 +0530] "POST /api/messages HTTP/1.1" 500 188 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:22:04,730 - asyncio - ERROR - unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-1' coro=<_run_app() done, defined at C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py:303> exception=OSError(10048, "error while attempting to bind on address ('127.0.0.1', 3978): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted")>
+Traceback (most recent call last):
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 544, in run_app
+    loop.run_until_complete(main_task)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web.py", line 448, in _run_app
+    await site.start()
+  File "C:\Users\rajaseharanr\AgentsToolkitProjects\.venv\Lib\site-packages\aiohttp\web_runner.py", line 119, in start
+    self._server = await loop.create_server(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Python313\Lib\asyncio\base_events.py", line 1630, in create_server
+    raise OSError(err.errno, msg) from None
+OSError: [Errno 10048] error while attempting to bind on address ('127.0.0.1', 3978): [winerror 10048] only one usage of each socket address (protocol/network address/port) is normally permitted
+2025-09-18 14:29:42,656 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:29:42 +0530] "POST /api/messages HTTP/1.1" 500 188 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:31:43,684 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:31:43 +0530] "POST /api/messages HTTP/1.1" 401 267 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:33:24,446 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:33:24 +0530] "POST /api/messages HTTP/1.1" 500 236 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:35:38,172 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:35:38 +0530] "POST /api/messages HTTP/1.1" 500 226 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:37:14,709 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:37:14 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:37:24,458 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /help
+2025-09-18 14:37:24,471 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:37:24 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:37:37,271 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /python-basics
+2025-09-18 14:37:37,276 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:37:37 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:38:28,447 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): hello
+2025-09-18 14:38:28,462 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:38:28 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:38:38,707 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /help
+2025-09-18 14:38:38,717 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:38:38 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:38:48,520 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /enroll
+2025-09-18 14:38:48,532 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:38:48 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:39:05,004 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /enroll python-basics
+2025-09-18 14:39:05,007 - sandbox_storage - INFO - User ae2800e1-3035-48ac-a089-4a3f527fe198 enrolled in course python-basics
+2025-09-18 14:39:05,013 - config - INFO - User ae2800e1-3035-48ac-a089-4a3f527fe198 enrolled in python-basics
+2025-09-18 14:39:05,014 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:39:05 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 14:39:13,528 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /profile
+2025-09-18 14:39:13,542 - aiohttp.access - INFO - ::1 [18/Sep/2025:14:39:13 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 15:00:13,677 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /status
+2025-09-18 15:00:13,695 - aiohttp.access - INFO - ::1 [18/Sep/2025:15:00:13 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 15:00:40,174 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /profile
+2025-09-18 15:00:40,186 - aiohttp.access - INFO - ::1 [18/Sep/2025:15:00:40 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 15:03:09,898 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /progress
+2025-09-18 15:03:09,907 - aiohttp.access - INFO - ::1 [18/Sep/2025:15:03:09 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+2025-09-18 15:03:22,465 - config - INFO - Message from User (ae2800e1-3035-48ac-a089-4a3f527fe198): /help
+2025-09-18 15:03:22,474 - aiohttp.access - INFO - ::1 [18/Sep/2025:15:03:22 +0530] "POST /api/messages HTTP/1.1" 200 169 "-" "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"

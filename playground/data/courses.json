@@ -1,0 +1,27 @@
+{
+  "python-basics": {
+    "name": "Python Basics",
+    "description": "Learn fundamental Python programming concepts",
+    "difficulty": "beginner",
+    "estimated_duration": "4 weeks",
+    "topics": [
+      "variables",
+      "functions",
+      "loops",
+      "data structures"
+    ]
+  },
+  "javascript-fundamentals": {
+    "name": "JavaScript Fundamentals",
+    "description": "Master core JavaScript concepts",
+    "difficulty": "beginner",
+    "estimated_duration": "3 weeks",
+    "topics": [
+      "variables",
+      "functions",
+      "objects",
+      "arrays",
+      "DOM"
+    ]
+  }
+}

@@ -1,71 +1,73 @@
-"""
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the MIT License.
-"""
-
 import os
-
+import logging
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load local development environment - look for .env in parent directory first
+if os.path.exists('../.env'):
+    load_dotenv('../.env')
+elif os.path.exists('.env'):
+    load_dotenv('.env')
+else:
+    load_dotenv()  # Look in default locations
 
 class Config:
-    """Bot Configuration"""
+    """Bot Framework Emulator Configuration"""
 
-    PORT = 3978
+    # Server Configuration
+    PORT = int(os.environ.get("PORT", 3978))
+    
+    # Bot Configuration (for local testing, these can be dummy values)
     APP_ID = os.environ.get("BOT_ID", "")
     APP_PASSWORD = os.environ.get("BOT_PASSWORD", "")
-    APP_TYPE = os.environ.get("BOT_TYPE", "")
-    APP_TENANTID = os.environ.get("BOT_TENANT_ID", "")
-    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")  # OpenAI API key (may be empty; validated later)
-    OPENAI_MODEL_NAME = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")  # Allow override via env
-
+    
+    # OpenAI Configuration
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+    OPENAI_MODEL_NAME = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+    
+    # Local Development Configuration
+    ENVIRONMENT = os.environ.get("ENVIRONMENT", "local-development")
+    STORAGE_TYPE = os.environ.get("STORAGE_TYPE", "file")
+    DATA_DIRECTORY = os.environ.get("DATA_DIRECTORY", "playground/data")
+    LOG_DIRECTORY = os.environ.get("LOG_DIRECTORY", "playground/logs")
+    
     @staticmethod
     def validate_environment():
-        """Extended environment validation & sandbox guard messages."""
-        env = os.environ.get("ENVIRONMENT", "") or os.environ.get("TEAMSFX_ENV", "")
+        """Validate local development environment configuration"""
         missing = []
-        for var in ["BOT_ID", "BOT_PASSWORD", "OPENAI_API_KEY"]:
+        required_vars = ["OPENAI_API_KEY"]  # BOT_ID and BOT_PASSWORD not required for emulator
+        
+        for var in required_vars:
             if not os.environ.get(var):
                 missing.append(var)
+        
         if missing:
-            print(f"[WARN] Missing required environment variables: {', '.join(missing)}")
-
-        # Model validation
-        model = os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
-        if not model:
-            print("[WARN] OPENAI_MODEL not set; defaulting to gpt-3.5-turbo")
-        elif model.lower().startswith("gpt-4") and env.lower() == "playground":
-            print("[INFO] Using a GPT-4 class model in playground; ensure rate limits are acceptable.")
-
-        # Storage type validation
-        storage_type = os.environ.get("STORAGE_TYPE", "file").lower()
-        supported = {"file", "azure_table", "cosmos"}
-        if storage_type not in supported:
-            print(f"[WARN] STORAGE_TYPE '{storage_type}' not recognized. Supported: {', '.join(supported)}. Defaulting to 'file'.")
-
-        # Quiz question sanity
-        qpd = os.environ.get("QUIZ_QUESTIONS_PER_DAY")
-        if qpd:
-            try:
-                qpd_val = int(qpd)
-                if qpd_val <= 0:
-                    print("[WARN] QUIZ_QUESTIONS_PER_DAY should be > 0; ignoring invalid value.")
-                elif qpd_val > 50:
-                    print("[INFO] High QUIZ_QUESTIONS_PER_DAY value; consider reducing for user experience.")
-            except ValueError:
-                print("[WARN] QUIZ_QUESTIONS_PER_DAY must be an integer.")
-
-        # Azure OpenAI pairing
-        if os.environ.get("AZURE_OPENAI_ENDPOINT") and not os.environ.get("AZURE_OPENAI_DEPLOYMENT"):
-            print("[WARN] AZURE_OPENAI_ENDPOINT set but AZURE_OPENAI_DEPLOYMENT missing.")
-
-        # Sandbox hints
-        if env.lower() == "playground":
-            if os.environ.get("BOT_ID", "").startswith("00000000"):
-                print("[WARN] BOT_ID appears placeholder; update with sandbox App ID.")
-        if env.lower() == "production" and ".onmicrosoft" in os.environ.get("BOT_ID", ""):
-            print("[INFO] Running production mode with what looks like a sandbox App ID—confirm this is intentional.")
-
-# Execute validation on import
-Config.validate_environment()
+            print(f"❌ Missing required environment variables: {', '.join(missing)}")
+            print("Please update your .env file with the missing values.")
+            return False
+        
+        # Environment-specific validations
+        env = Config.ENVIRONMENT.lower()
+        if env == "local-development":
+            print("✅ Local development environment detected")
+            print(f"   Bot ID: {Config.APP_ID or 'Using emulator defaults'}")
+            print(f"   OpenAI Model: {Config.OPENAI_MODEL_NAME}")
+            print(f"   Storage Type: {Config.STORAGE_TYPE}")
+            print(f"   Data Directory: {Config.DATA_DIRECTORY}")
+        
+        return True
+    
+    @staticmethod
+    def setup_logging():
+        """Set up logging for local development"""
+        os.makedirs(Config.LOG_DIRECTORY, exist_ok=True)
+        
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(f'{Config.LOG_DIRECTORY}/bot.log'),
+                logging.StreamHandler()
+            ]
+        )
+        
+        return logging.getLogger(__name__)

@@ -1,0 +1,8 @@
+aiohttp==3.9.3
+botbuilder-core==4.15.0
+botbuilder-schema==4.15.0
+botbuilder-integration-aiohttp==4.15.0
+openai>=1.52.0,<2.0.0
+python-dotenv==1.0.0
+teams-ai==1.8.1
+Flask==2.3.2

@@ -552,14 +552,8 @@ import logging
 from datetime import datetime
 from dataclasses import asdict
 
-from botbuilder.core import MemoryStorage, TurnContext, MessageFactory, CardFactory
+from botbuilder.core import ActivityHandler, TurnContext, MessageFactory
 from botbuilder.schema import ChannelAccount, Activity, ActivityTypes
-from teams import Application, ApplicationOptions, TeamsAdapter
-from teams.ai import AIOptions
-from teams.ai.models import OpenAIModel, OpenAIModelOptions
-from teams.ai.planners import ActionPlanner, ActionPlannerOptions
-from teams.ai.prompts import PromptManager, PromptManagerOptions
-from teams.state import TurnState
 
 from config import Config
 from sandbox_storage import SandboxStorage, UserProfile
@@ -576,70 +570,50 @@ if not config.validate_environment():
 # Initialize sandbox storage
 storage = SandboxStorage(config.DATA_DIRECTORY)
 
-# Create AI components
-model = OpenAIModel(
-    OpenAIModelOptions(
-        api_key=config.OPENAI_API_KEY,
-        default_model=config.OPENAI_MODEL_NAME,
-    )
-)
-
-prompts = PromptManager(PromptManagerOptions(prompts_folder=f"{os.getcwd()}/src/prompts"))
-
-planner = ActionPlanner(
-    ActionPlannerOptions(
-        model=model,
-        prompts=prompts,
-        default_prompt="chat",
-        enable_feedback_loop=True,
-    )
-)
-
-# Define storage and application
-memory_storage = MemoryStorage()
-bot_app = Application[TurnState](
-    ApplicationOptions(
-        bot_app_id=config.APP_ID,
-        storage=memory_storage,
-        adapter=TeamsAdapter(config),
-        ai=AIOptions(planner=planner, enable_feedback_loop=True),
-    )
-)
-
-@bot_app.message()
-async def on_message(context: TurnContext, state: TurnState):
-    """Handle incoming messages"""
-    user_id = context.activity.from_property.id
-    user_name = context.activity.from_property.name or "User"
-    message_text = context.activity.text.strip().lower()
+class EchoBot(ActivityHandler):
+    """Bot Framework Emulator Compatible Bot"""
     
-    logger.info(f"Message from {user_name} ({user_id}): {message_text}")
-    
-    try:
-        # Handle specific commands
-        if message_text.startswith('/help'):
-            await handle_help_command(context)
-        elif message_text.startswith('/enroll'):
-            await handle_enroll_command(context, message_text)
-        elif message_text.startswith('/profile'):
-            await handle_profile_command(context, user_id)
-        elif message_text.startswith('/status'):
-            await handle_status_command(context)
-        elif message_text.startswith('/admin'):
-            await handle_admin_command(context, user_id)
-        else:
-            # Default AI response using the planner
-            await bot_app.ai.run(context, state)
-            
-    except Exception as e:
-        logger.error(f"Error handling message: {e}")
-        await context.send_activity(MessageFactory.text(
-            "❌ Sorry, I encountered an error processing your message. Please try again."
-        ))
+    def __init__(self):
+        super().__init__()
+        self.storage = storage
+        self.config = config
+        self.logger = logger
+        
+    async def on_message_activity(self, turn_context: TurnContext):
+        """Handle incoming messages"""
+        user_id = turn_context.activity.from_property.id
+        user_name = turn_context.activity.from_property.name or "User"
+        message_text = turn_context.activity.text.strip().lower() if turn_context.activity.text else ""
+        
+        self.logger.info(f"Message from {user_name} ({user_id}): {message_text}")
+        
+        try:
+            # Handle specific commands
+            if message_text.startswith('/help'):
+                await self.handle_help_command(turn_context)
+            elif message_text.startswith('/enroll'):
+                await self.handle_enroll_command(turn_context, message_text)
+            elif message_text.startswith('/profile'):
+                await self.handle_profile_command(turn_context, user_id)
+            elif message_text.startswith('/status'):
+                await self.handle_status_command(turn_context)
+            elif message_text.startswith('/admin'):
+                await self.handle_admin_command(turn_context, user_id)
+            else:
+                # Default response for non-command messages
+                await turn_context.send_activity(MessageFactory.text(
+                    f"Hello {user_name}! I received your message: '{turn_context.activity.text}'. Try /help to see available commands."
+                ))
+                
+        except Exception as e:
+            self.logger.error(f"Error handling message: {e}")
+            await turn_context.send_activity(MessageFactory.text(
+                "❌ Sorry, I encountered an error processing your message. Please try again."
+            ))
 
-async def handle_help_command(context: TurnContext):
-    """Show help information"""
-    help_text = """
+    async def handle_help_command(self, turn_context: TurnContext):
+        """Show help information"""
+        help_text = """
 🤖 **AI Learning Bot - Sandbox Mode** 🤖
 
 **Available Commands:**
@@ -665,68 +639,68 @@ async def handle_help_command(context: TurnContext):
 
 *Running in sandbox mode with file-based storage*
 """
-    await context.send_activity(MessageFactory.text(help_text))
+        await turn_context.send_activity(MessageFactory.text(help_text))
 
-async def handle_enroll_command(context: TurnContext, message_text: str):
-    """Handle user enrollment"""
-    user_id = context.activity.from_property.id
-    user_name = context.activity.from_property.name or "User"
-    
-    # Parse course from command
-    parts = message_text.split()
-    if len(parts) < 2:
-        await context.send_activity(MessageFactory.text(
-            "❌ Please specify a course. Example: `/enroll python-basics`\n\n"
-            "Available courses: python-basics, javascript-intro, data-science, web-dev"
-        ))
-        return
-    
-    course = parts[1]
-    available_courses = ["python-basics", "javascript-intro", "data-science", "web-dev"]
-    
-    if course not in available_courses:
-        await context.send_activity(MessageFactory.text(
-            f"❌ Course '{course}' not found.\n\n"
-            f"Available courses: {', '.join(available_courses)}"
-        ))
-        return
-    
-    # Enroll user
-    success = storage.enroll_user(user_id, course)
-    
-    if success:
-        profile = storage.get_user_profile(user_id)
-        await context.send_activity(MessageFactory.text(
-            f"🎉 **Enrollment Successful!**\n\n"
-            f"👤 **Student**: {user_name}\n"
-            f"📚 **Course**: {course}\n"
-            f"📅 **Start Date**: {profile.start_date[:10] if profile.start_date else 'Today'}\n\n"
-            f"Welcome to your learning journey! Use `/profile` to check your progress."
-        ))
-        logger.info(f"User {user_id} enrolled in {course}")
-    else:
-        await context.send_activity(MessageFactory.text(
-            "❌ Enrollment failed. Please try again or contact support."
-        ))
+    async def handle_enroll_command(self, turn_context: TurnContext, message_text: str):
+        """Handle user enrollment"""
+        user_id = turn_context.activity.from_property.id
+        user_name = turn_context.activity.from_property.name or "User"
+        
+        # Parse course from command
+        parts = message_text.split()
+        if len(parts) < 2:
+            await turn_context.send_activity(MessageFactory.text(
+                "❌ Please specify a course. Example: `/enroll python-basics`\n\n"
+                "Available courses: python-basics, javascript-intro, data-science, web-dev"
+            ))
+            return
+        
+        course = parts[1]
+        available_courses = ["python-basics", "javascript-intro", "data-science", "web-dev"]
+        
+        if course not in available_courses:
+            await turn_context.send_activity(MessageFactory.text(
+                f"❌ Course '{course}' not found.\n\n"
+                f"Available courses: {', '.join(available_courses)}"
+            ))
+            return
+        
+        # Enroll user
+        success = self.storage.enroll_user(user_id, course)
+        
+        if success:
+            profile = self.storage.get_user_profile(user_id)
+            await turn_context.send_activity(MessageFactory.text(
+                f"🎉 **Enrollment Successful!**\n\n"
+                f"👤 **Student**: {user_name}\n"
+                f"📚 **Course**: {course}\n"
+                f"📅 **Start Date**: {profile.start_date[:10] if profile.start_date else 'Today'}\n\n"
+                f"Welcome to your learning journey! Use `/profile` to check your progress."
+            ))
+            self.logger.info(f"User {user_id} enrolled in {course}")
+        else:
+            await turn_context.send_activity(MessageFactory.text(
+                "❌ Enrollment failed. Please try again or contact support."
+            ))
 
-async def handle_profile_command(context: TurnContext, user_id: str):
-    """Show user profile"""
-    profile = storage.get_user_profile(user_id)
-    
-    if not profile:
-        await context.send_activity(MessageFactory.text(
-            "❌ **No Profile Found**\n\n"
-            "You haven't enrolled in any courses yet.\n"
-            "Use `/enroll [course-name]` to get started!"
-        ))
-        return
-    
-    # Calculate progress percentage
-    progress_percent = 0
-    if profile.total_questions > 0:
-        progress_percent = round((profile.correct_answers / profile.total_questions) * 100, 1)
-    
-    profile_text = f"""
+    async def handle_profile_command(self, turn_context: TurnContext, user_id: str):
+        """Show user profile"""
+        profile = self.storage.get_user_profile(user_id)
+        
+        if not profile:
+            await turn_context.send_activity(MessageFactory.text(
+                "❌ **No Profile Found**\n\n"
+                "You haven't enrolled in any courses yet.\n"
+                "Use `/enroll [course-name]` to get started!"
+            ))
+            return
+        
+        # Calculate progress percentage
+        progress_percent = 0
+        if profile.total_questions > 0:
+            progress_percent = round((profile.correct_answers / profile.total_questions) * 100, 1)
+        
+        profile_text = f"""
 👤 **Learning Profile**
 
 📚 **Course**: {profile.enrolled_course or 'Not enrolled'}
@@ -741,14 +715,14 @@ async def handle_profile_command(context: TurnContext, user_id: str):
 
 *Quiz feature coming in Day 4! Stay tuned! 🚀*
 """
-    
-    await context.send_activity(MessageFactory.text(profile_text))
+        
+        await turn_context.send_activity(MessageFactory.text(profile_text))
 
-async def handle_status_command(context: TurnContext):
-    """Show bot system status"""
-    stats = storage.get_storage_stats()
-    
-    status_text = f"""
+    async def handle_status_command(self, turn_context: TurnContext):
+        """Show bot system status"""
+        stats = self.storage.get_storage_stats()
+        
+        status_text = f"""
 🤖 **Bot System Status - Sandbox Mode**
 
 🟢 **Status**: Online and Running
@@ -765,14 +739,14 @@ async def handle_status_command(context: TurnContext):
 
 **System Health**: ✅ All systems operational
 """
-    
-    await context.send_activity(MessageFactory.text(status_text))
+        
+        await turn_context.send_activity(MessageFactory.text(status_text))
 
-async def handle_admin_command(context: TurnContext, user_id: str):
-    """Show admin statistics (simplified for sandbox)"""
-    stats = storage.get_storage_stats()
-    
-    admin_text = f"""
+    async def handle_admin_command(self, turn_context: TurnContext, user_id: str):
+        """Show admin statistics (simplified for sandbox)"""
+        stats = self.storage.get_storage_stats()
+        
+        admin_text = f"""
 🔧 **Admin Dashboard - Sandbox Mode**
 
 📈 **User Statistics**:
@@ -792,15 +766,14 @@ async def handle_admin_command(context: TurnContext, user_id: str):
 
 *Note: This is sandbox mode. Full admin features available in production mode.*
 """
-    
-    await context.send_activity(MessageFactory.text(admin_text))
+        
+        await turn_context.send_activity(MessageFactory.text(admin_text))
 
-@bot_app.conversation_update("membersAdded")
-async def on_members_added(context: TurnContext, state: TurnState):
-    """Welcome new members"""
-    for member in context.activity.members_added:
-        if member.id != context.activity.recipient.id:
-            welcome_text = f"""
+    async def on_members_added_activity(self, members_added: list, turn_context: TurnContext):
+        """Welcome new members"""
+        for member in members_added:
+            if member.id != turn_context.activity.recipient.id:
+                welcome_text = f"""
 🎉 **Welcome to AI Learning Bot!** 🎉
 
 Hello! I'm your AI-powered learning assistant running in sandbox mode.
@@ -820,7 +793,10 @@ Ready to start learning? Try: `/enroll python-basics`
 
 *Currently running in sandbox mode for development and testing.*
 """
-            await context.send_activity(MessageFactory.text(welcome_text))
+                await turn_context.send_activity(MessageFactory.text(welcome_text))
+
+# Create bot instance
+bot_app = EchoBot()
 ```
 
 ---
